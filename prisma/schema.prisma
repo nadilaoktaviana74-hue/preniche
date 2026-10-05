@@ -1,0 +1,295 @@
+// Prisma schema for Preniche - Campus Thrift & Marketplace
+// Based on SRS.md specifications
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+}
+
+enum TransactionType {
+  FOR_SALE    // Dijual
+  FOR_RENT    // Disewakan
+  FREE        // Gratis (untuk maba / sesama mahasiswa)
+}
+
+enum RentalPeriod {
+  DAILY       // Per hari
+  WEEKLY      // Per minggu
+  MONTHLY     // Per bulan
+  SEMESTER    // Per semester
+}
+
+enum ItemCondition {
+  NEW             // Baru (belum pernah dipakai)
+  LIKE_NEW        // Bekas - Sangat Baik (seperti baru)
+  LIGHTLY_USED    // Bekas - Baik (tanda pemakaian wajar)
+  WELL_USED       // Bekas - Layak Pakai
+}
+
+enum ListingStatus {
+  AVAILABLE   // Tersedia
+  RESERVED    // Reserved (Janji COD terkunci)
+  SOLD        // Terjual / Selesai
+  ARCHIVED    // Diarsipkan oleh penjual
+  REMOVED     // Dihapus oleh Admin / Moderasi
+}
+
+enum AppointmentStatus {
+  PENDING     // Menunggu konfirmasi
+  CONFIRMED   // Disepakati (Status barang jadi RESERVED)
+  COMPLETED   // Transaksi COD selesai
+  CANCELLED   // Dibatalkan
+}
+
+enum ReportReason {
+  SCAM_OR_FRAUD          // Indikasi Penipuan
+  PROHIBITED_ITEM        // Barang Terlarang / Melanggar Aturan
+  FAKE_ACCOUNT           // Akun Palsu / Bukan Mahasiswa
+  MISLEADING_INFO        // Informasi Barang Menyesatkan
+  INAPPROPRIATE_BEHAVIOR // Perilaku Tidak Pantas
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+// 1. User Model (Mahasiswa terverifikasi email .ac.id & Admin)
+model User {
+  id              String      @id @default(cuid())
+  email           String      @unique // Wajib domain .ac.id
+  name            String
+  passwordHash    String
+  avatarUrl       String?
+  phone           String?     // Opsional, disembunyikan sampai COD disepakati
+  campusName      String      // Nama Universitas (e.g. ITB, UI, UGM, Undip, ITS, dll)
+  faculty         String?     // Fakultas (e.g. Sekolah Teknik Elektro & Informatika)
+  major           String?     // Program Studi (e.g. Teknik Informatika)
+  batchYear       Int?        // Angkatan (e.g. 2022)
+  kostArea        String?     // Area Kost / Sekitar Kampus (e.g. Dago Barat, Pogung, Kukusan)
+  bio             String?
+  role            Role        @default(STUDENT)
+  status          UserStatus  @default(ACTIVE)
+  isVerified      Boolean     @default(false) // Verifikasi email kampus .ac.id
+  verificationOtp String?     // OTP verifikasi pendaftaran
+  rating          Float       @default(5.0)
+  reviewCount     Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relasi
+  products        Product[]           @relation("SellerProducts")
+  boughtItems     Transaction[]       @relation("BuyerTransactions")
+  soldItems       Transaction[]       @relation("SellerTransactions")
+  appointmentsAsBuyer  CODAppointment[] @relation("BuyerAppointments")
+  appointmentsAsSeller CODAppointment[] @relation("SellerAppointments")
+  givenReviews    Review[]            @relation("GivenReviews")
+  receivedReviews Review[]            @relation("ReceivedReviews")
+  reportsFiled    Report[]            @relation("ReporterUser")
+  reportsReceived Report[]            @relation("ReportedUser")
+  sentMessages    ChatMessage[]       @relation("SentMessages")
+  conversationsAsUser1 Conversation[] @relation("User1Conversations")
+  conversationsAsUser2 Conversation[] @relation("User2Conversations")
+
+  @@index([campusName])
+  @@index([email])
+}
+
+// 2. Category Model
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique // e.g. "Buku & Diktat", "Peralatan Kost", "Alat Praktikum"
+  slug        String    @unique
+  description String?
+  iconName    String?   // Lucide icon identifier
+  displayOrder Int      @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+// 3. Product Model (Barang Preloved Kampus)
+model Product {
+  id              String          @id @default(cuid())
+  title           String
+  description     String
+  price           Int             // Dalam Rupiah (IDR). 0 jika FREE
+  originalPrice   Int?            // Harga beli baru (untuk komparasi hemat maba)
+  transactionType TransactionType @default(FOR_SALE)
+  rentalPeriod    RentalPeriod?   // Hanya aktif jika transactionType == FOR_RENT
+  condition       ItemCondition   @default(LIGHTLY_USED)
+  status          ListingStatus   @default(AVAILABLE)
+  images          String[]        // URL foto produk (maks 5 foto)
+  
+  // Atribut Khusus Kampus & Hyper-local
+  campusName      String          // Kampus penjual
+  kostArea        String          // Lokasi area sekitar kampus (e.g. Gerlong, Pogung Baru)
+  preferredMeetingPoint String?   // Preset titik temu rekomendasi penjual
+  
+  // Khusus Kategori Buku & Diktat (FR-LIST-03)
+  courseName      String?         // Nama Mata Kuliah (e.g. Matematika Diskrit)
+  courseCode      String?         // Kode Matkul / Dosen (e.g. IF2110 / Pak Budi)
+  lecturerName    String?         // Dosen Pengampu (opsional)
+
+  // Metrik & Relasi
+  viewCount       Int             @default(0)
+  sellerId        String
+  seller          User            @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        Category        @relation(fields: [categoryId], references: [id])
+  
+  appointments    CODAppointment[]
+  transactions    Transaction[]
+  reports         Report[]        @relation("ReportedProduct")
+  conversations   Conversation[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([campusName])
+  @@index([categoryId])
+  @@index([status])
+  @@index([transactionType])
+  @@index([courseCode])
+}
+
+// 4. Safe Meeting Point (Preset titik temu aman kampus)
+model SafeMeetingPoint {
+  id          String   @id @default(cuid())
+  campusName  String   // e.g. "Institut Teknologi Bandung"
+  name        String   // e.g. "Perpustakaan Pusat Lantai 1"
+  landmark    String   // e.g. "Dekat Mesin Peminjaman Mandiri"
+  description String?  // Jam operasional ramai & aman
+  isRecommended Boolean @default(true)
+
+  @@index([campusName])
+}
+
+// 5. COD Appointment / Meeting Scheduler (FR-CHAT-02, FR-CHAT-03)
+model CODAppointment {
+  id            String            @id @default(cuid())
+  productId     String
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  buyerId       String
+  buyer         User              @relation("BuyerAppointments", fields: [buyerId], references: [id])
+  sellerId      String
+  seller        User              @relation("SellerAppointments", fields: [sellerId], references: [id])
+  meetingPoint  String            // Titik temu aman yang disepakati
+  scheduledAt   DateTime          // Waktu janji temu COD
+  status        AppointmentStatus @default(PENDING)
+  notes         String?           // Catatan ciri pakaian atau tempat duduk
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  transaction   Transaction?
+
+  @@index([productId])
+  @@index([buyerId])
+  @@index([sellerId])
+}
+
+// 6. Transaction Model
+model Transaction {
+  id              String          @id @default(cuid())
+  productId       String
+  product         Product         @relation(fields: [productId], references: [id])
+  buyerId         String
+  buyer           User            @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  sellerId        String
+  seller          User            @relation("SellerTransactions", fields: [sellerId], references: [id])
+  appointmentId   String?         @unique
+  appointment     CODAppointment? @relation(fields: [appointmentId], references: [id])
+  
+  finalPrice      Int             // Harga disepakati
+  transactionType TransactionType
+  status          String          @default("COMPLETED") // COMPLETED, CANCELLED
+  completedAt     DateTime?       @default(now())
+  createdAt       DateTime        @default(now())
+
+  reviews         Review[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+}
+
+// 7. Review & Rating Model (FR-MOD-01)
+model Review {
+  id            String       @id @default(cuid())
+  transactionId String
+  transaction   Transaction  @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  reviewerId    String
+  reviewer      User         @relation("GivenReviews", fields: [reviewerId], references: [id])
+  revieweeId    String
+  reviewee      User         @relation("ReceivedReviews", fields: [revieweeId], references: [id])
+  rating        Int          // 1 - 5 bintang
+  comment       String
+  createdAt     DateTime     @default(now())
+
+  @@index([revieweeId])
+}
+
+// 8. Report Model (FR-MOD-02, FR-ADMIN-01)
+model Report {
+  id                String        @id @default(cuid())
+  reporterId        String
+  reporter          User          @relation("ReporterUser", fields: [reporterId], references: [id])
+  reportedUserId    String?
+  reportedUser      User?         @relation("ReportedUser", fields: [reportedUserId], references: [id])
+  reportedProductId String?
+  reportedProduct   Product?      @relation("ReportedProduct", fields: [reportedProductId], references: [id])
+  reason            ReportReason
+  description       String
+  status            ReportStatus  @default(PENDING)
+  adminNotes        String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([status])
+}
+
+// 9. In-App Chat Conversation & Message (FR-CHAT-01)
+model Conversation {
+  id          String        @id @default(cuid())
+  productId   String
+  product     Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user1Id     String
+  user1       User          @relation("User1Conversations", fields: [user1Id], references: [id])
+  user2Id     String
+  user2       User          @relation("User2Conversations", fields: [user2Id], references: [id])
+  lastMessage String?
+  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime      @default(now())
+  messages    ChatMessage[]
+
+  @@unique([productId, user1Id, user2Id])
+}
+
+model ChatMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+  text           String
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+}
