@@ -18,7 +18,7 @@ export const MobileNav = () => {
       isSpecial: true,
     },
     { label: "Janji COD", href: "/catalog?status=RESERVED", icon: ShieldCheck },
-    { label: "Akun Mhs", href: "/#profile", icon: User },
+    { label: "Akun Mhs", href: "/profile", icon: User },
   ];
 
   return (

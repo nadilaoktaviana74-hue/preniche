@@ -30,10 +30,8 @@ export const SafeCODModal: React.FC<SafeCODModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Filter campus preset safe meeting spots
-  const campusSafePoints = MOCK_SAFE_POINTS.filter((p) =>
-    product.campusName.toLowerCase().includes(p.campusName.split(" ")[0].toLowerCase())
-  );
+  // Titik temu aman di area kampus Untag Surabaya
+  const campusSafePoints = MOCK_SAFE_POINTS;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

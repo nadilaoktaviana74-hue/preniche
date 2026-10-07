@@ -11,6 +11,7 @@ import {
   getTransactionTypeBadge,
 } from "@/lib/utils";
 import { CampusBadge } from "@/components/CampusBadge";
+import { VerifiedStudentBadge } from "@/components/VerifiedStudentBadge";
 import { SafeCODModal } from "@/components/SafeCODModal";
 import { ProductCard } from "@/components/ProductCard";
 import {
@@ -317,21 +318,19 @@ export default function ProductDetailPage() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900">
                       {product.seller.name}
                     </h4>
-                    {product.seller.isVerified && (
-                      <span title="Terverifikasi Email Mahasiswa .ac.id" className="inline-flex shrink-0">
-                        <CheckCircle2 className="w-4 h-4 text-brand-600" />
-                      </span>
+                    {(product.seller.isVerifiedStudent ?? product.seller.isVerified) && (
+                      <VerifiedStudentBadge size="sm" campusEmail={product.seller.campusEmail} />
                     )}
                   </div>
                   <p className="text-[11px] text-slate-500">
                     {product.seller.faculty} {product.seller.batchYear ? `(${product.seller.batchYear})` : ""}
                   </p>
                   <p className="text-[11px] text-slate-500">
-                    Kampus: <strong>{product.seller.campusName.split(" ")[0]}</strong>
+                    Kampus: <strong className="text-red-800">Untag Surabaya</strong>
                   </p>
                   
                   <div className="flex items-center gap-3 mt-2 text-xs font-medium text-slate-700">

@@ -27,40 +27,45 @@ export const Footer = () => {
 
           {/* Quick links */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Kategori Pilihan</h4>
+            <h4 className="text-sm font-semibold text-white mb-3">Kategori Kebutuhan Untag</h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <Link href="/catalog?category=cat_buku" className="hover:text-white transition-colors">
-                  Buku & Diktat Kuliah
-                </Link>
-              </li>
-              <li>
                 <Link href="/catalog?category=cat_kost" className="hover:text-white transition-colors">
-                  Peralatan Kost & Elektronik
+                  Peralatan Kos
                 </Link>
               </li>
               <li>
                 <Link href="/catalog?category=cat_praktikum" className="hover:text-white transition-colors">
-                  Alat Praktikum & Lab
+                  Alat Praktikum & Perkuliahan
                 </Link>
               </li>
               <li>
-                <Link href="/catalog?type=FREE" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
-                  🎁 Hibah Barang Gratis Maba
+                <Link href="/catalog?category=cat_buku" className="hover:text-white transition-colors">
+                  Buku Kuliah & Modul
+                </Link>
+              </li>
+              <li>
+                <Link href="/catalog?category=cat_fashion" className="hover:text-white transition-colors">
+                  Thrift & Fashion
+                </Link>
+              </li>
+              <li>
+                <Link href="/catalog?category=cat_gadget" className="hover:text-white transition-colors">
+                  Elektronik & Gadget Kos
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Kampus Mitra */}
+          {/* Kampus Untag Surabaya */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Komunitas Kampus</h4>
+            <h4 className="text-sm font-semibold text-white mb-3">Untag Surabaya</h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li>ITB Bandung (Ganesha & Jatinangor)</li>
-              <li>UI Depok & Salemba</li>
-              <li>UGM Yogyakarta (Bulaksumur)</li>
-              <li>Undip Semarang (Tembalang)</li>
-              <li>ITS & Unair Surabaya</li>
+              <li className="text-slate-300 font-semibold">Universitas 17 Agustus 1945 Surabaya</li>
+              <li>Jl. Semolowaru No. 45 Surabaya</li>
+              <li>Gedung Graha Wiyata & Gedung Q</li>
+              <li>Plaza & Kantin Kampus Untag</li>
+              <li>Email: @student.untag-sby.ac.id</li>
             </ul>
           </div>
 

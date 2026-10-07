@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   MOCK_CATEGORIES,
   MOCK_SAFE_POINTS,
-  CAMPUS_OPTIONS,
+  UNTAG_CAMPUS_NAME,
 } from "@/data/mockData";
 import {
   UploadCloud,
@@ -29,7 +29,7 @@ export default function SellPage() {
 
   // Form State
   const [title, setTitle] = useState("");
-  const [categoryId, setCategoryId] = useState("cat_buku");
+  const [categoryId, setCategoryId] = useState("cat_kost");
   const [description, setDescription] = useState("");
   const [transactionType, setTransactionType] = useState<TransactionType>("FOR_SALE");
   const [rentalPeriod, setRentalPeriod] = useState<"DAILY" | "MONTHLY">("MONTHLY");
@@ -42,8 +42,8 @@ export default function SellPage() {
   const [courseCode, setCourseCode] = useState("");
   const [lecturerName, setLecturerName] = useState("");
 
-  // Location attributes
-  const [campusName, setCampusName] = useState(CAMPUS_OPTIONS[1]); // Default ITB
+  // Location attributes (Single-campus: Untag Surabaya)
+  const campusName = UNTAG_CAMPUS_NAME;
   const [kostArea, setKostArea] = useState("");
   const [preferredMeetingPoint, setPreferredMeetingPoint] = useState("");
 
@@ -86,9 +86,7 @@ export default function SellPage() {
     }, 1200);
   };
 
-  const relevantSafePoints = MOCK_SAFE_POINTS.filter((p) =>
-    campusName.toLowerCase().includes(p.campusName.split(" ")[0].toLowerCase())
-  );
+  const relevantSafePoints = MOCK_SAFE_POINTS;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -595,19 +593,11 @@ export default function SellPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                      Kampus Mahasiswa *
+                      Kampus Mahasiswa
                     </label>
-                    <select
-                      value={campusName}
-                      onChange={(e) => setCampusName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    >
-                      {CAMPUS_OPTIONS.filter((c) => c !== "Semua Kampus").map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-red-200 bg-red-50/60 font-bold text-red-900 select-none">
+                      {UNTAG_CAMPUS_NAME}
+                    </div>
                   </div>
 
                   <div>
@@ -619,7 +609,7 @@ export default function SellPage() {
                       required
                       value={kostArea}
                       onChange={(e) => setKostArea(e.target.value)}
-                      placeholder="Misal: Dago Asri / Kutek UI / Pogung Baru"
+                      placeholder="Misal: Semolowaru / Nginden / Menur Pumpungan"
                       className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
                     />
                   </div>

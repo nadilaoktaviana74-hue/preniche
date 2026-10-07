@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { MobileNav } from "@/components/MobileNav";
+import { AuthProvider } from "@/lib/auth-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,20 +13,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Preniche — Campus Thrift & Preloved Marketplace Mahasiswa",
+  title: "Preniche Untag — Marketplace & Preloved Mahasiswa Untag Surabaya",
   description:
-    "Platform jual-beli dan sewa barang preloved terverifikasi email kampus .ac.id. Temukan buku kuliah, peralatan kost, alat praktikum murah dengan titik COD aman di lingkungan kampus.",
+    "Platform jual-beli dan sewa barang preloved terverifikasi email mahasiswa Untag Surabaya (@student.untag-sby.ac.id). Temukan peralatan kos, alat praktikum, dan buku modul murah di lingkungan Semolowaru.",
   keywords: [
     "campus thrift",
     "preloved mahasiswa",
-    "jual beli buku kuliah",
-    "peralatan kost",
-    "titik temu COD kampus",
-    "preniche",
-    "ITB",
-    "UI",
-    "UGM",
-    "Undip",
+    "Untag Surabaya",
+    "Universitas 17 Agustus 1945 Surabaya",
+    "peralatan kos Semolowaru",
+    "alat praktikum teknik Untag",
+    "buku modul Untag",
+    "titik COD Graha Wiyata",
+    "preniche untag",
   ],
 };
 
@@ -37,10 +37,12 @@ export default function RootLayout({
   return (
     <html lang="id" className={inter.variable}>
       <body className="font-sans antialiased min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <MobileNav />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <MobileNav />
+        </AuthProvider>
       </body>
     </html>
   );

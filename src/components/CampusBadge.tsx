@@ -1,41 +1,28 @@
 import React from "react";
-import { getCampusColor } from "@/lib/utils";
 import { GraduationCap } from "lucide-react";
 
 interface CampusBadgeProps {
-  campusName: string;
+  campusName?: string;
   size?: "sm" | "md";
   showIcon?: boolean;
 }
 
 export const CampusBadge: React.FC<CampusBadgeProps> = ({
-  campusName,
   size = "md",
   showIcon = true,
 }) => {
-  const color = getCampusColor(campusName);
-  
-  // Format short name if lengthy
-  let displayName = campusName;
-  if (campusName.includes("(")) {
-    const matches = campusName.match(/\(([^)]+)\)/);
-    if (matches && matches[1]) {
-      displayName = matches[1];
-    }
-  }
-
   const sizeClasses =
     size === "sm"
-      ? "text-xs px-2 py-0.5"
-      : "text-xs px-2.5 py-1 font-medium";
+      ? "text-[11px] px-2 py-0.5"
+      : "text-xs px-2.5 py-1 font-semibold";
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border ${color.bg} ${color.text} ${color.border} ${sizeClasses}`}
-      title={campusName}
+      className={`inline-flex items-center gap-1.5 rounded-full border bg-red-50 text-red-800 border-red-200 font-medium shadow-2xs ${sizeClasses}`}
+      title="Universitas 17 Agustus 1945 Surabaya"
     >
-      {showIcon && <GraduationCap className="w-3.5 h-3.5 shrink-0" />}
-      <span className="truncate max-w-[130px]">{displayName}</span>
+      {showIcon && <GraduationCap className="w-3.5 h-3.5 text-red-600 shrink-0" />}
+      <span>Untag Surabaya</span>
     </span>
   );
 };

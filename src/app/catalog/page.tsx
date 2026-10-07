@@ -5,10 +5,11 @@ import { useSearchParams } from "next/navigation";
 import {
   MOCK_PRODUCTS,
   MOCK_CATEGORIES,
-  CAMPUS_OPTIONS,
+  UNTAG_AREAS,
+  UNTAG_CAMPUS_NAME,
 } from "@/data/mockData";
 import { ProductCard } from "@/components/ProductCard";
-import { ProductItem, TransactionType, ItemCondition } from "@/types";
+import { TransactionType } from "@/types";
 import {
   Search,
   Filter,
@@ -16,9 +17,10 @@ import {
   X,
   Sparkles,
   ArrowUpDown,
-  GraduationCap,
   PackageOpen,
   RotateCcw,
+  MapPin,
+  Building,
 } from "lucide-react";
 
 function CatalogContent() {
@@ -26,12 +28,12 @@ function CatalogContent() {
 
   // Initial states from URL params if present
   const initialQuery = searchParams.get("q") || "";
-  const initialCampus = searchParams.get("campus") || "Semua Kampus";
+  const initialArea = searchParams.get("area") || "Semua Area Sekitar Untag";
   const initialCategory = searchParams.get("category") || "all";
   const initialType = (searchParams.get("type") as TransactionType) || "all";
 
   const [query, setQuery] = useState(initialQuery);
-  const [selectedCampus, setSelectedCampus] = useState(initialCampus);
+  const [selectedArea, setSelectedArea] = useState(initialArea);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedType, setSelectedType] = useState<string>(initialType);
   const [selectedCondition, setSelectedCondition] = useState<string>("all");
@@ -43,7 +45,7 @@ function CatalogContent() {
   // Filter & sort logic
   const filteredProducts = useMemo(() => {
     return MOCK_PRODUCTS.filter((item) => {
-      // 1. Text search (title, description, courseCode, courseName)
+      // 1. Text search
       if (query.trim()) {
         const q = query.toLowerCase();
         const matchTitle = item.title.toLowerCase().includes(q);
@@ -56,11 +58,10 @@ function CatalogContent() {
         }
       }
 
-      // 2. Campus filter
-      if (selectedCampus !== "Semua Kampus") {
-        if (
-          !item.campusName.toLowerCase().includes(selectedCampus.toLowerCase())
-        ) {
+      // 2. Area Sekitar Untag filter
+      if (selectedArea !== "Semua Area Sekitar Untag") {
+        const cleanArea = selectedArea.split(" ")[0].toLowerCase();
+        if (!item.kostArea.toLowerCase().includes(cleanArea)) {
           return false;
         }
       }
@@ -90,12 +91,11 @@ function CatalogContent() {
     }).sort((a, b) => {
       if (sortBy === "price-asc") return a.price - b.price;
       if (sortBy === "price-desc") return b.price - a.price;
-      // Default: newest
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [
     query,
-    selectedCampus,
+    selectedArea,
     selectedCategory,
     selectedType,
     selectedCondition,
@@ -104,7 +104,7 @@ function CatalogContent() {
 
   const resetFilters = () => {
     setQuery("");
-    setSelectedCampus("Semua Kampus");
+    setSelectedArea("Semua Area Sekitar Untag");
     setSelectedCategory("all");
     setSelectedType("all");
     setSelectedCondition("all");
@@ -113,7 +113,7 @@ function CatalogContent() {
 
   const hasActiveFilters =
     query !== "" ||
-    selectedCampus !== "Semua Kampus" ||
+    selectedArea !== "Semua Area Sekitar Untag" ||
     selectedCategory !== "all" ||
     selectedType !== "all" ||
     selectedCondition !== "all";
@@ -123,11 +123,15 @@ function CatalogContent() {
       {/* Header & Search Bar */}
       <div className="mb-8 space-y-4">
         <div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-800 border border-red-200 text-xs font-semibold mb-2">
+            <Building className="w-3.5 h-3.5 text-red-600" />
+            <span>Katalog Resmi {UNTAG_CAMPUS_NAME}</span>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Katalog Barang Preloved Kampus
+            Katalog Preloved Mahasiswa Untag Surabaya
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Temukan barang murah & layak pakai langsung dari sesama mahasiswa di sekitarmu
+            Buku kuliah, perlengkapan kos, alat praktikum & pakaian langsung dari sesama mahasiswa Untag di Semolowaru
           </p>
         </div>
 
@@ -139,8 +143,8 @@ function CatalogContent() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari judul barang, nama dosen, atau kode matkul (contoh: Kalkulus / MA1101)..."
-              className="w-full pl-10 pr-10 py-3 text-xs sm:text-sm bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-sm"
+              placeholder="Cari kasur, jas lab Untag, modul, kipas angin, kalkulator..."
+              className="w-full pl-10 pr-10 py-3 text-xs sm:text-sm bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 shadow-sm"
             />
             {query && (
               <button
@@ -156,10 +160,10 @@ function CatalogContent() {
             onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
             className="lg:hidden flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-semibold text-slate-700 shadow-sm shrink-0"
           >
-            <SlidersHorizontal className="w-4 h-4 text-brand-600" />
+            <SlidersHorizontal className="w-4 h-4 text-red-600" />
             <span>Filter</span>
             {hasActiveFilters && (
-              <span className="w-2 h-2 rounded-full bg-brand-600"></span>
+              <span className="w-2 h-2 rounded-full bg-red-600"></span>
             )}
           </button>
         </div>
@@ -180,7 +184,7 @@ function CatalogContent() {
             onClick={() => setSelectedType("FOR_SALE")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
               selectedType === "FOR_SALE"
-                ? "bg-brand-600 text-white shadow-sm"
+                ? "bg-red-600 text-white shadow-sm"
                 : "bg-slate-100 hover:bg-slate-200 text-slate-700"
             }`}
           >
@@ -205,7 +209,7 @@ function CatalogContent() {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Hibah Gratis (Rp 0)</span>
+            <span>Hibah Gratis Maba Untag</span>
           </button>
         </div>
       </div>
@@ -218,16 +222,16 @@ function CatalogContent() {
             isMobileFilterOpen ? "block" : "hidden"
           } lg:block lg:col-span-1 space-y-6`}
         >
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+          <div className="bg-white rounded-3xl border border-slate-200/90 p-5 space-y-6 shadow-sm">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-brand-600" />
-                <h3 className="font-bold text-slate-900 text-sm">Filter Katalog</h3>
+              <div className="flex items-center gap-2 font-black text-slate-900 text-sm">
+                <Filter className="w-4 h-4 text-red-600" />
+                <span>Filter Pencarian</span>
               </div>
               {hasActiveFilters && (
                 <button
                   onClick={resetFilters}
-                  className="text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1"
+                  className="text-xs text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
                 >
                   <RotateCcw className="w-3 h-3" />
                   Reset
@@ -235,36 +239,39 @@ function CatalogContent() {
               )}
             </div>
 
-            {/* Campus Filter */}
+            {/* Area Kost Sekitar Untag Filter (Single Campus Localized) */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Kampus Mahasiswa
+                Area Sekitar Untag
               </label>
-              <select
-                aria-label="Pilih Kampus Mahasiswa"
-                value={selectedCampus}
-                onChange={(e) => setSelectedCampus(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
-              >
-                {CAMPUS_OPTIONS.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <select
+                  aria-label="Pilih Area Sekitar Kampus Untag"
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  {UNTAG_AREAS.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* Category Filter */}
+            {/* 5 Kategori Kebutuhan Mahasiswa Untag Filter */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Kategori Produk
+                Kategori Kebutuhan
               </label>
               <div className="space-y-1.5">
                 <button
                   onClick={() => setSelectedCategory("all")}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between ${
                     selectedCategory === "all"
-                      ? "bg-brand-50 text-brand-700 font-bold"
+                      ? "bg-red-50 text-red-800 font-bold"
                       : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -283,11 +290,11 @@ function CatalogContent() {
                       onClick={() => setSelectedCategory(cat.id)}
                       className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between ${
                         selectedCategory === cat.id
-                          ? "bg-brand-50 text-brand-700 font-bold"
+                          ? "bg-red-50 text-red-800 font-bold"
                           : "text-slate-600 hover:bg-slate-50"
                       }`}
                     >
-                      <span className="truncate">{cat.name}</span>
+                      <span>{cat.name}</span>
                       <span className="text-[11px] text-slate-400">{count}</span>
                     </button>
                   );
@@ -296,9 +303,9 @@ function CatalogContent() {
             </div>
 
             {/* Condition Filter */}
-            <div>
+            <div className="pt-2 border-t border-slate-100">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Kondisi Barang
+                Kondisi Fisik
               </label>
               <div className="space-y-1.5 text-xs">
                 {[
@@ -306,7 +313,7 @@ function CatalogContent() {
                   { id: "NEW", label: "Baru (Belum dipakai)" },
                   { id: "LIKE_NEW", label: "Bekas - Sangat Baik" },
                   { id: "LIGHTLY_USED", label: "Bekas - Baik" },
-                  { id: "WELL_USED", label: "Bekas - Layak" },
+                  { id: "WELL_USED", label: "Bekas - Layak Pakai" },
                 ].map((item) => (
                   <label
                     key={item.id}
@@ -317,7 +324,7 @@ function CatalogContent() {
                       name="condition"
                       checked={selectedCondition === item.id}
                       onChange={() => setSelectedCondition(item.id)}
-                      className="text-brand-600 focus:ring-brand-500"
+                      className="text-red-600 focus:ring-red-500"
                     />
                     <span>{item.label}</span>
                   </label>
@@ -336,7 +343,7 @@ function CatalogContent() {
               <strong className="text-slate-900">
                 {filteredProducts.length}
               </strong>{" "}
-              barang preloved terverifikasi
+              barang mahasiswa Untag Surabaya
             </div>
 
             {/* Sorting Dropdown */}
@@ -349,7 +356,7 @@ function CatalogContent() {
                 onChange={(e) =>
                   setSortBy(e.target.value as "newest" | "price-asc" | "price-desc")
                 }
-                className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="newest">Paling Baru Diunggah</option>
                 <option value="price-asc">Harga: Terendah ke Tertinggi</option>
@@ -370,20 +377,20 @@ function CatalogContent() {
                   </button>
                 </span>
               )}
-              {selectedCampus !== "Semua Kampus" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
-                  Kampus: {selectedCampus}
-                  <button onClick={() => setSelectedCampus("Semua Kampus")}>
-                    <X className="w-3 h-3 text-blue-500 hover:text-blue-800" />
+              {selectedArea !== "Semua Area Sekitar Untag" && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-800 border border-red-200">
+                  Area: {selectedArea}
+                  <button onClick={() => setSelectedArea("Semua Area Sekitar Untag")}>
+                    <X className="w-3 h-3 text-red-500 hover:text-red-800" />
                   </button>
                 </span>
               )}
               {selectedCategory !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-50 text-brand-800 border border-brand-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-800 border border-red-200">
                   Kategori:{" "}
                   {MOCK_CATEGORIES.find((c) => c.id === selectedCategory)?.name}
                   <button onClick={() => setSelectedCategory("all")}>
-                    <X className="w-3 h-3 text-brand-600 hover:text-brand-900" />
+                    <X className="w-3 h-3 text-red-600 hover:text-red-900" />
                   </button>
                 </span>
               )}
@@ -414,11 +421,11 @@ function CatalogContent() {
                 Tidak ada barang yang cocok
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Coba sesuaikan kata kunci pencarian atau bersihkan filter kampus dan kategori untuk melihat opsi lainnya.
+                Coba sesuaikan kata kunci pencarian atau bersihkan filter kategori dan area untuk melihat pilihan barang mahasiswa Untag lainnya.
               </p>
               <button
                 onClick={resetFilters}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Reset Semua Filter
@@ -436,7 +443,7 @@ export default function CatalogPage() {
     <Suspense
       fallback={
         <div className="max-w-7xl mx-auto px-4 py-16 text-center text-slate-400">
-          Memuat katalog kampus...
+          Memuat katalog Untag Surabaya...
         </div>
       }
     >

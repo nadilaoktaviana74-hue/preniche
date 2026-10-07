@@ -7,6 +7,8 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  campusEmail?: string;
+  isVerifiedStudent: boolean;
   campusName: string;
   faculty?: string;
   major?: string;
@@ -15,7 +17,7 @@ export interface UserProfile {
   kostArea: string;
   rating: number;
   reviewCount: number;
-  isVerified: boolean;
+  isVerified?: boolean;
 }
 
 export interface Category {

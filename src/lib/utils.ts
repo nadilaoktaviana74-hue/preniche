@@ -70,25 +70,7 @@ export function getTransactionTypeBadge(type: TransactionType, rentalPeriod?: st
   }
 }
 
-export function getCampusColor(campusName: string): { bg: string; text: string; border: string } {
-  const normalized = campusName.toLowerCase();
-  if (normalized.includes("itb")) {
-    return { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-200" };
-  }
-  if (normalized.includes("ui") || normalized.includes("indonesia")) {
-    return { bg: "bg-yellow-50", text: "text-yellow-800", border: "border-yellow-300" };
-  }
-  if (normalized.includes("ugm") || normalized.includes("gadjah mada")) {
-    return { bg: "bg-amber-50", text: "text-amber-800", border: "border-amber-200" };
-  }
-  if (normalized.includes("its") || normalized.includes("sepuluh")) {
-    return { bg: "bg-cyan-50", text: "text-cyan-800", border: "border-cyan-200" };
-  }
-  if (normalized.includes("undip") || normalized.includes("diponegoro")) {
-    return { bg: "bg-indigo-50", text: "text-indigo-800", border: "border-indigo-200" };
-  }
-  if (normalized.includes("unair") || normalized.includes("airlangga")) {
-    return { bg: "bg-sky-50", text: "text-sky-800", border: "border-sky-200" };
-  }
-  return { bg: "bg-emerald-50", text: "text-emerald-800", border: "border-emerald-200" };
+export function getCampusColor(_campusName?: string): { bg: string; text: string; border: string } {
+  // Single campus branding: Universitas 17 Agustus 1945 Surabaya (Merah Kebangsaan Untag)
+  return { bg: "bg-red-50", text: "text-red-800", border: "border-red-200" };
 }

@@ -72,76 +72,85 @@ enum ReportStatus {
   DISMISSED
 }
 
-// 1. User Model (Mahasiswa terverifikasi email .ac.id & Admin)
+// 1. User Model (Mahasiswa Untag Surabaya & Pengguna Umum)
 model User {
-  id              String      @id @default(cuid())
-  email           String      @unique // Wajib domain .ac.id
-  name            String
-  passwordHash    String
-  avatarUrl       String?
-  phone           String?     // Opsional, disembunyikan sampai COD disepakati
-  campusName      String      // Nama Universitas (e.g. ITB, UI, UGM, Undip, ITS, dll)
-  faculty         String?     // Fakultas (e.g. Sekolah Teknik Elektro & Informatika)
-  major           String?     // Program Studi (e.g. Teknik Informatika)
-  batchYear       Int?        // Angkatan (e.g. 2022)
-  kostArea        String?     // Area Kost / Sekitar Kampus (e.g. Dago Barat, Pogung, Kukusan)
-  bio             String?
-  role            Role        @default(STUDENT)
-  status          UserStatus  @default(ACTIVE)
-  isVerified      Boolean     @default(false) // Verifikasi email kampus .ac.id
-  verificationOtp String?     // OTP verifikasi pendaftaran
-  rating          Float       @default(5.0)
-  reviewCount     Int         @default(0)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id                String      @id @default(cuid())
+  email             String      @unique // Email akun utama (Gmail / email pribadi)
+  campusEmail       String?     @unique // Email kampus resmi Untag Surabaya (@student.untag-sby.ac.id / @untag-sby.ac.id)
+  isVerifiedStudent Boolean     @default(false) // Status Mahasiswa Untag Terverifikasi
+  name              String
+  passwordHash      String
+  avatarUrl         String?
+  phone             String?     // Opsional, disembunyikan sampai COD disepakati
+  campusName        String      @default("Universitas 17 Agustus 1945 Surabaya") // Single campus: Untag Surabaya
+  faculty           String?     // Fakultas di Untag (Teknik, Ekonomi & Bisnis, Ilmu Sosial & Ilmu Politik, Hukum, Psikologi, Vokasi)
+  major             String?     // Program Studi (Teknik Informatika, Teknik Industri, Ilmu Komunikasi, dll)
+  batchYear         Int?        // Angkatan
+  kostArea          String?     // Area Kost Sekitar Untag (Semolowaru, Nginden Semolo, Menur Pumpungan, Manyar, Klampis)
+  bio               String?
+  role              Role        @default(STUDENT)
+  status            UserStatus  @default(ACTIVE)
+  isVerified        Boolean     @default(false)
+  verificationOtp   String?     // OTP verifikasi
+  rating            Float       @default(5.0)
+  reviewCount       Int         @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   // Relasi
-  products        Product[]           @relation("SellerProducts")
-  boughtItems     Transaction[]       @relation("BuyerTransactions")
-  soldItems       Transaction[]       @relation("SellerTransactions")
+  products          Product[]           @relation("SellerProducts")
+  boughtItems       Transaction[]       @relation("BuyerTransactions")
+  soldItems         Transaction[]       @relation("SellerTransactions")
   appointmentsAsBuyer  CODAppointment[] @relation("BuyerAppointments")
   appointmentsAsSeller CODAppointment[] @relation("SellerAppointments")
-  givenReviews    Review[]            @relation("GivenReviews")
-  receivedReviews Review[]            @relation("ReceivedReviews")
-  reportsFiled    Report[]            @relation("ReporterUser")
-  reportsReceived Report[]            @relation("ReportedUser")
-  sentMessages    ChatMessage[]       @relation("SentMessages")
+  givenReviews      Review[]            @relation("GivenReviews")
+  receivedReviews   Review[]            @relation("ReceivedReviews")
+  reportsFiled      Report[]            @relation("ReporterUser")
+  reportsReceived   Report[]            @relation("ReportedUser")
+  sentMessages      ChatMessage[]       @relation("SentMessages")
   conversationsAsUser1 Conversation[] @relation("User1Conversations")
   conversationsAsUser2 Conversation[] @relation("User2Conversations")
 
   @@index([campusName])
   @@index([email])
+  @@index([campusEmail])
 }
 
-// 2. Category Model
+// 2. Category Model (Khusus Kebutuhan Mahasiswa Untag Surabaya)
+// Kategori:
+// 1. Peralatan Kos (Kasur, kipas angin, alat masak, lemari, dll.)
+// 2. Alat Praktikum & Perkuliahan (Jas lab, alat gambar, papan alas, perlengkapan rekayasa/teknik, dll.)
+// 3. Buku Kuliah & Modul (Buku paket, modul praktikum, catatan kuliah)
+// 4. Thrift & Fashion (Baju, jaket, sepatu, tas kampus)
+// 5. Elektronik & Gadget Kos (Magicsom, setrika, stopkontak, kabel, dll.)
 model Category {
   id          String    @id @default(cuid())
-  name        String    @unique // e.g. "Buku & Diktat", "Peralatan Kost", "Alat Praktikum"
+  name        String    @unique
   slug        String    @unique
   description String?
-  iconName    String?   // Lucide icon identifier
+  iconName    String?   // Lucide icon identifier (Home, FlaskConical, BookOpen, Shirt, Laptop)
   displayOrder Int      @default(0)
   products    Product[]
   createdAt   DateTime  @default(now())
 }
 
-// 3. Product Model (Barang Preloved Kampus)
+// 3. Product Model (Barang Preloved Mahasiswa Untag Surabaya)
 model Product {
   id              String          @id @default(cuid())
   title           String
   description     String
   price           Int             // Dalam Rupiah (IDR). 0 jika FREE
-  originalPrice   Int?            // Harga beli baru (untuk komparasi hemat maba)
+  originalPrice   Int?            // Harga beli baru (untuk komparasi hemat)
   transactionType TransactionType @default(FOR_SALE)
   rentalPeriod    RentalPeriod?   // Hanya aktif jika transactionType == FOR_RENT
   condition       ItemCondition   @default(LIGHTLY_USED)
   status          ListingStatus   @default(AVAILABLE)
   images          String[]        // URL foto produk (maks 5 foto)
   
-  // Atribut Khusus Kampus & Hyper-local
-  campusName      String          // Kampus penjual
-  kostArea        String          // Lokasi area sekitar kampus (e.g. Gerlong, Pogung Baru)
-  preferredMeetingPoint String?   // Preset titik temu rekomendasi penjual
+  // Atribut Lokasi Untag Surabaya (Semolowaru 45)
+  campusName      String          @default("Universitas 17 Agustus 1945 Surabaya")
+  kostArea        String          // Area sekitar kampus Untag (Semolowaru, Nginden, Menur, dll)
+  preferredMeetingPoint String?   // Titik temu rekomendasi di Untag (Graha Wiyata, Plaza Untag, Gedung Q, dll)
   
   // Khusus Kategori Buku & Diktat (FR-LIST-03)
   courseName      String?         // Nama Mata Kuliah (e.g. Matematika Diskrit)

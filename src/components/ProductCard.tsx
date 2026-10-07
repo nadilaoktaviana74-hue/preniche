@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ProductItem } from "@/types";
 import { formatRupiah, getConditionLabel, getTransactionTypeBadge } from "@/lib/utils";
 import { CampusBadge } from "./CampusBadge";
+import { VerifiedStudentBadge } from "./VerifiedStudentBadge";
 import { Star, MapPin, CheckCircle2, Bookmark, BookMarked } from "lucide-react";
 
 interface ProductCardProps {
@@ -116,8 +117,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           {/* Seller info */}
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center justify-between text-xs text-slate-500 gap-1.5 pt-1">
+            <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
               <div className="relative w-5 h-5 rounded-full overflow-hidden bg-slate-200 shrink-0">
                 <Image
                   src={product.seller.avatarUrl}
@@ -126,17 +127,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   className="object-cover"
                 />
               </div>
-              <span className="truncate text-slate-700 font-medium">
+              <span className="truncate text-slate-700 font-medium max-w-[85px]">
                 {product.seller.name.split(" ")[0]}
               </span>
-              {product.seller.isVerified && (
-                <span title="Mahasiswa Terverifikasi Email .ac.id" className="inline-flex shrink-0">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-brand-600" />
-                </span>
+              {(product.seller.isVerifiedStudent ?? product.seller.isVerified) && (
+                <VerifiedStudentBadge size="xs" campusEmail={product.seller.campusEmail} />
               )}
             </div>
 
-            <div className="flex items-center gap-1 text-slate-700 font-medium">
+            <div className="flex items-center gap-1 text-slate-700 font-medium shrink-0">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
               <span>{product.seller.rating.toFixed(1)}</span>
             </div>
