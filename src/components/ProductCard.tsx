@@ -4,7 +4,6 @@ import Image from "next/image";
 import { ProductItem } from "@/types";
 import { formatRupiah, getConditionLabel, getTransactionTypeBadge } from "@/lib/utils";
 import { CampusBadge } from "./CampusBadge";
-import { VerifiedStudentBadge } from "./VerifiedStudentBadge";
 import { Star, MapPin, CheckCircle2, Bookmark, BookMarked } from "lucide-react";
 
 interface ProductCardProps {
@@ -130,9 +129,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <span className="truncate text-slate-700 font-medium max-w-[85px]">
                 {product.seller.name.split(" ")[0]}
               </span>
-              {(product.seller.isVerifiedStudent ?? product.seller.isVerified) && (
-                <VerifiedStudentBadge size="xs" campusEmail={product.seller.campusEmail} />
-              )}
             </div>
 
             <div className="flex items-center gap-1 text-slate-700 font-medium shrink-0">

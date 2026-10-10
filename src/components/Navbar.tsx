@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Search,
   PlusCircle,
@@ -12,12 +12,26 @@ import {
   MapPin,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { VerifiedStudentBadge } from "@/components/VerifiedStudentBadge";
 
 export const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+
+  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+    return null;
+  }
+
+  const isLoggedIn = Boolean(user);
+
+  const handleProtectedNavigation = (targetPath: string) => {
+    if (!isLoggedIn) {
+      router.push("/login");
+    } else {
+      router.push(targetPath);
+    }
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,13 +142,14 @@ export const Navbar = () => {
 
           {/* Action Button: Jual Barang */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/sell"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-red-600/20 transition-all hover:scale-[1.02]"
+            <button
+              type="button"
+              onClick={() => handleProtectedNavigation("/sell")}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-red-600/20 transition-all hover:scale-[1.02] cursor-pointer"
             >
               <PlusCircle className="w-4 h-4 shrink-0" />
               <span>Jual Barang</span>
-            </Link>
+            </button>
 
             {/* User Profile Mini Badge or Auth Links */}
             {user ? (
@@ -151,20 +166,11 @@ export const Navbar = () => {
                   )}
                 </div>
                 <div className="text-left text-xs leading-tight">
-                  <div className="flex items-center gap-1.5">
-                    <p className="font-semibold text-slate-800 group-hover:text-red-700 transition truncate max-w-[100px]">
-                      {user.name.split(" ")[0]}
-                    </p>
-                    {user.isVerifiedStudent && (
-                      <VerifiedStudentBadge size="xs" campusEmail={user.campusEmail} />
-                    )}
-                  </div>
-                  <p className="text-[10px] font-medium">
-                    {user.isVerifiedStudent ? (
-                      <span className="text-red-700 font-bold">Untag ✓</span>
-                    ) : (
-                      <span className="text-amber-600 hover:underline">Verifikasi Untag →</span>
-                    )}
+                  <p className="font-semibold text-slate-800 group-hover:text-red-700 transition truncate max-w-[100px]">
+                    {user.name.split(" ")[0]}
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-medium">
+                    Profil Saya
                   </p>
                 </div>
               </Link>

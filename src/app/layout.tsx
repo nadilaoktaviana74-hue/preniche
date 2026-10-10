@@ -15,7 +15,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Preniche Untag — Marketplace & Preloved Mahasiswa Untag Surabaya",
   description:
-    "Platform jual-beli dan sewa barang preloved terverifikasi email mahasiswa Untag Surabaya (@student.untag-sby.ac.id). Temukan peralatan kos, alat praktikum, dan buku modul murah di lingkungan Semolowaru.",
+    "Platform jual-beli dan sewa barang preloved mahasiswa Untag Surabaya. Temukan peralatan kos, alat praktikum, dan buku modul murah di lingkungan Semolowaru.",
   keywords: [
     "campus thrift",
     "preloved mahasiswa",

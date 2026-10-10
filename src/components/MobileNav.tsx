@@ -8,6 +8,10 @@ import { Home, Compass, PlusCircle, ShieldCheck, User } from "lucide-react";
 export const MobileNav = () => {
   const pathname = usePathname();
 
+  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+    return null;
+  }
+
   const navItems = [
     { label: "Beranda", href: "/", icon: Home },
     { label: "Katalog", href: "/catalog", icon: Compass },

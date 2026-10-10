@@ -8,12 +8,13 @@ export const UNTAG_CAMPUS_NAME = "Universitas 17 Agustus 1945 Surabaya";
 
 interface AuthContextType {
   user: UserProfile | null;
+  isLoggedIn: boolean;
   isLoading: boolean;
   login: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   register: (data: {
-    name: string;
     email: string;
+    name?: string;
     password?: string;
     kostArea?: string;
     faculty?: string;
@@ -27,26 +28,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const STORAGE_KEY = "preniche_current_user";
+const AUTH_ACTIVE_KEY = "preniche_auth_active";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage or initialize with demo user
+  // Load user from localStorage - only if explicitly authenticated session is active
   useEffect(() => {
     try {
+      const authActive = localStorage.getItem(AUTH_ACTIVE_KEY);
       const savedUser = localStorage.getItem(STORAGE_KEY);
-      if (savedUser) {
+      if (authActive === "true" && savedUser) {
         setUser(JSON.parse(savedUser));
       } else {
-        // Default initial session: Dimas (Untag Terverifikasi) for demo
-        const defaultUser = MOCK_USERS.user1;
-        setUser(defaultUser);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultUser));
+        setUser(null);
       }
     } catch (e) {
       console.error("Failed to read user from localStorage", e);
-      setUser(MOCK_USERS.user1);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -55,8 +55,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const saveUser = (newUser: UserProfile | null) => {
     setUser(newUser);
     if (newUser) {
+      localStorage.setItem(AUTH_ACTIVE_KEY, "true");
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
     } else {
+      localStorage.removeItem(AUTH_ACTIVE_KEY);
       localStorage.removeItem(STORAGE_KEY);
     }
   };
@@ -77,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: true };
     }
 
-    // If new email (e.g. user@gmail.com), create a new user profile for Untag Surabaya
+    // If new email, create a new user profile
     const nameFromEmail = trimmedEmail.split("@")[0].replace(/[._]/g, " ");
     const formattedName = nameFromEmail
       .split(" ")
@@ -86,16 +88,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const newUser: UserProfile = {
       id: `usr_${Date.now()}`,
-      name: formattedName || "Mahasiswa Untag",
+      name: formattedName || "Pengguna Preniche",
       email: trimmedEmail,
       campusName: UNTAG_CAMPUS_NAME,
-      faculty: "Fakultas Teknik",
-      major: "Teknik Informatika",
       kostArea: "Nginden Semolo",
       rating: 5.0,
       reviewCount: 0,
       avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmedEmail)}`,
-      isVerifiedStudent: false, // Belum verifikasi email kampus Untag
+      isVerifiedStudent: false,
       isVerified: false,
     };
 
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       rating: 5.0,
       reviewCount: 0,
       avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
-      isVerifiedStudent: false, // Belum verifikasi email @student.untag-sby.ac.id
+      isVerifiedStudent: false,
       isVerified: false,
     };
 
@@ -126,8 +126,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (data: {
-    name: string;
     email: string;
+    name?: string;
     password?: string;
     kostArea?: string;
     faculty?: string;
@@ -137,13 +137,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!trimmedEmail) {
       return { success: false, error: "Email wajib diisi." };
     }
-    if (!data.name.trim()) {
-      return { success: false, error: "Nama lengkap wajib diisi." };
-    }
+
+    const derivedName =
+      (data.name && data.name.trim()) ||
+      trimmedEmail
+        .split("@")[0]
+        .replace(/[._]/g, " ")
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ") ||
+      "Pengguna Preniche";
 
     const newUser: UserProfile = {
       id: `usr_${Date.now()}`,
-      name: data.name.trim(),
+      name: derivedName,
       email: trimmedEmail,
       campusName: UNTAG_CAMPUS_NAME,
       faculty: data.faculty || "Fakultas Teknik",
@@ -151,8 +158,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       kostArea: data.kostArea || "Sekitar Untag Semolowaru",
       rating: 5.0,
       reviewCount: 0,
-      avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name)}`,
-      isVerifiedStudent: false, // Belum verifikasi email kampus
+      avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmedEmail)}`,
+      isVerifiedStudent: false,
       isVerified: false,
     };
 
@@ -170,25 +177,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const emailTrimmed = campusEmail.trim().toLowerCase();
-
-    // Validasi khusus Untag Surabaya:
-    // Wajib domain @student.untag-sby.ac.id atau @untag-sby.ac.id
-    const isUntagStudent = emailTrimmed.endsWith("@student.untag-sby.ac.id");
-    const isUntagOfficial = emailTrimmed.endsWith("@untag-sby.ac.id");
-
-    if (!isUntagStudent && !isUntagOfficial) {
-      return {
-        success: false,
-        error: "Verifikasi gagal! Email kampus wajib menggunakan domain resmi Untag Surabaya (@student.untag-sby.ac.id atau @untag-sby.ac.id).",
-      };
-    }
-
     const updatedUser: UserProfile = {
       ...user,
       campusEmail: emailTrimmed,
-      campusName: UNTAG_CAMPUS_NAME,
-      isVerifiedStudent: true,
-      isVerified: true,
     };
 
     saveUser(updatedUser);
@@ -205,6 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+        isLoggedIn: Boolean(user),
         isLoading,
         login,
         loginWithGoogle,

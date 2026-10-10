@@ -11,7 +11,6 @@ import {
   getTransactionTypeBadge,
 } from "@/lib/utils";
 import { CampusBadge } from "@/components/CampusBadge";
-import { VerifiedStudentBadge } from "@/components/VerifiedStudentBadge";
 import { SafeCODModal } from "@/components/SafeCODModal";
 import { ProductCard } from "@/components/ProductCard";
 import {
@@ -303,10 +302,10 @@ export default function ProductDetailPage() {
               </p>
             </div>
 
-            {/* Verified Student Seller Profile Card (FR-AUTH-03) */}
+            {/* Seller Profile Card */}
             <div className="pt-4 border-t border-slate-100">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-3">
-                Profil Penjual Terverifikasi
+                Profil Penjual
               </span>
               <div className="flex items-start gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden bg-slate-200 shrink-0">
@@ -322,9 +321,6 @@ export default function ProductDetailPage() {
                     <h4 className="font-bold text-xs sm:text-sm text-slate-900">
                       {product.seller.name}
                     </h4>
-                    {(product.seller.isVerifiedStudent ?? product.seller.isVerified) && (
-                      <VerifiedStudentBadge size="sm" campusEmail={product.seller.campusEmail} />
-                    )}
                   </div>
                   <p className="text-[11px] text-slate-500">
                     {product.seller.faculty} {product.seller.batchYear ? `(${product.seller.batchYear})` : ""}
