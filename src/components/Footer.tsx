@@ -8,7 +8,7 @@ import { GraduationCap, ShieldCheck, Heart, MapPin } from "lucide-react";
 export const Footer = () => {
   const pathname = usePathname();
 
-  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+  if (pathname === "/login" || pathname === "/register") {
     return null;
   }
   return (
@@ -88,7 +88,7 @@ export const Footer = () => {
                 </p>
               </div>
               <p className="text-[11px] text-slate-400">
-                ⚠️ Jangan pernah mentransfer uang muka (DP) sebelum mengecek kondisi barang secara langsung.
+                Penting: Jangan pernah mentransfer uang muka (DP) sebelum mengecek kondisi barang secara langsung.
               </p>
             </div>
           </div>

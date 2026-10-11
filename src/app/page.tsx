@@ -3,7 +3,22 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MapPin, Heart } from "lucide-react";
+import {
+  MapPin,
+  Heart,
+  Grid,
+  Package,
+  FlaskConical,
+  BookOpen,
+  Shirt,
+  Building2,
+  Utensils,
+  Library,
+  Sparkles,
+  Lightbulb,
+  Handshake,
+  Recycle,
+} from "lucide-react";
 import { PrenicheHeader } from "@/components/PrenicheHeader";
 
 export default function HomePage() {
@@ -285,6 +300,165 @@ export default function HomePage() {
             </div>
           </aside>
         </div>
+
+        {/* 3-CARD FEATURE SECTION */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-5 my-6 w-full">
+          {/* CARD 1: Kategori Favorit */}
+          <div className="bg-[#59313D] rounded-[28px] p-6 shadow-lg text-white flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-3">
+                <Grid className="w-5 h-5 text-[#D8B2BC] shrink-0" />
+                <h3 className="font-bold text-lg text-white tracking-wide">
+                  Kategori Favorit
+                </h3>
+              </div>
+              <div className="border-b border-[#7A4955] mb-4 w-full" />
+              <div className="flex flex-col gap-2.5">
+                <Link
+                  href="/catalog?category=cat_kost"
+                  className="bg-[#7C515E] hover:bg-[#8C5663] rounded-2xl p-3 flex items-center gap-3 cursor-pointer transition-all group"
+                >
+                  <Package className="w-5 h-5 text-[#D8B2BC] shrink-0 group-hover:scale-105 transition-transform" />
+                  <span className="text-sm font-medium text-white">
+                    Peralatan Kos (Kasur, Kipas, Meja)
+                  </span>
+                </Link>
+                <Link
+                  href="/catalog?category=cat_praktikum"
+                  className="bg-[#7C515E] hover:bg-[#8C5663] rounded-2xl p-3 flex items-center gap-3 cursor-pointer transition-all group"
+                >
+                  <FlaskConical className="w-5 h-5 text-[#D8B2BC] shrink-0 group-hover:scale-105 transition-transform" />
+                  <span className="text-sm font-medium text-white">
+                    Alat Praktikum &amp; Lab
+                  </span>
+                </Link>
+                <Link
+                  href="/catalog?category=cat_buku"
+                  className="bg-[#7C515E] hover:bg-[#8C5663] rounded-2xl p-3 flex items-center gap-3 cursor-pointer transition-all group"
+                >
+                  <BookOpen className="w-5 h-5 text-[#D8B2BC] shrink-0 group-hover:scale-105 transition-transform" />
+                  <span className="text-sm font-medium text-white">
+                    Buku &amp; Modul Kuliah
+                  </span>
+                </Link>
+                <Link
+                  href="/catalog?category=cat_fashion"
+                  className="bg-[#7C515E] hover:bg-[#8C5663] rounded-2xl p-3 flex items-center gap-3 cursor-pointer transition-all group"
+                >
+                  <Shirt className="w-5 h-5 text-[#D8B2BC] shrink-0 group-hover:scale-105 transition-transform" />
+                  <span className="text-sm font-medium text-white">
+                    Thrift &amp; Fashion
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 2: Lokasi COD Aman */}
+          <div className="bg-[#59313D] rounded-[28px] p-6 shadow-lg text-white flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-3">
+                <MapPin className="w-5 h-5 text-[#D8B2BC] shrink-0" />
+                <h3 className="font-bold text-lg text-white tracking-wide">
+                  Lokasi COD Aman
+                </h3>
+              </div>
+              <div className="border-b border-[#7A4955] mb-4 w-full" />
+              <div className="flex flex-col gap-2.5">
+                <div className="bg-[#7C515E] rounded-2xl p-3 flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-[#D8B2BC] shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Graha Wiyata
+                    </p>
+                    <p className="text-xs text-[#F7E7EB]/80 leading-tight mt-0.5">
+                      Lantai 1 / Area Depan
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-[#7C515E] rounded-2xl p-3 flex items-center gap-3">
+                  <Utensils className="w-5 h-5 text-[#D8B2BC] shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Kantin Utama &amp; Plaza Kampus
+                    </p>
+                    <p className="text-xs text-[#F7E7EB]/80 leading-tight mt-0.5">
+                      Area Publik &amp; Terbuka
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-[#7C515E] rounded-2xl p-3 flex items-center gap-3">
+                  <Library className="w-5 h-5 text-[#D8B2BC] shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Perpustakaan Pusat
+                    </p>
+                    <p className="text-xs text-[#F7E7EB]/80 leading-tight mt-0.5">
+                      Gedung R. Ing. Soekonjono
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-white/70 mt-4 pt-3 border-t border-[#7A4955]">
+              Selalu pilih lokasi publik untuk transaksi tatap muka.
+            </p>
+          </div>
+
+          {/* CARD 3: Kenapa Preloved? */}
+          <div className="bg-[#59313D] rounded-[28px] p-6 shadow-lg text-white flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-3">
+                <Sparkles className="w-5 h-5 text-[#D8B2BC] shrink-0" />
+                <h3 className="font-bold text-lg text-white tracking-wide">
+                  Kenapa Preloved?
+                </h3>
+              </div>
+              <div className="border-b border-[#7A4955] mb-4 w-full" />
+              <div className="flex flex-col gap-2.5">
+                <div className="bg-[#7C515E] rounded-2xl p-3 flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-[#D8B2BC] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Hemat Sampai 70%
+                    </p>
+                    <p className="text-xs text-[#F7E7EB]/80 leading-tight mt-0.5">
+                      Jauh lebih hemat dibanding beli baru di toko
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-[#7C515E] rounded-2xl p-3 flex items-start gap-3">
+                  <Handshake className="w-5 h-5 text-[#D8B2BC] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Sesama Anak Untag
+                    </p>
+                    <p className="text-xs text-[#F7E7EB]/80 leading-tight mt-0.5">
+                      Komunikasi &amp; janjian lebih mudah
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-[#7C515E] rounded-2xl p-3 flex items-start gap-3">
+                  <Recycle className="w-5 h-5 text-[#D8B2BC] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Ramah Lingkungan
+                    </p>
+                    <p className="text-xs text-[#F7E7EB]/80 leading-tight mt-0.5">
+                      Kurangi sampah barang kos saat lulus atau pindahan
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/catalog"
+              className="bg-white/20 hover:bg-white/30 rounded-full py-2 px-4 text-xs font-semibold mt-4 text-center block text-white transition-colors cursor-pointer"
+            >
+              Pelajari Cara Kerja
+            </Link>
+          </div>
+        </section>
       </div>
     </div>
   );
