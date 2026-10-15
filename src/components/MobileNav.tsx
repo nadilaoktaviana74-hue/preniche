@@ -8,7 +8,12 @@ import { Home, Compass, PlusCircle, ShieldCheck, User } from "lucide-react";
 export const MobileNav = () => {
   const pathname = usePathname();
 
-  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+  if (
+    pathname === "/" ||
+    pathname === "/catalog" ||
+    pathname === "/login" ||
+    pathname === "/register"
+  ) {
     return null;
   }
 

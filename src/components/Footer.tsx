@@ -8,7 +8,11 @@ import { GraduationCap, ShieldCheck, Heart, MapPin } from "lucide-react";
 export const Footer = () => {
   const pathname = usePathname();
 
-  if (pathname === "/login" || pathname === "/register") {
+  if (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/catalog"
+  ) {
     return null;
   }
   return (

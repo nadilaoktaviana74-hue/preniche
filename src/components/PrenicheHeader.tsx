@@ -7,17 +7,25 @@ import { Search, ShoppingCart, User, PlusCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 interface PrenicheHeaderProps {
+  initialQuery?: string;
+  onSearchChange?: (query: string) => void;
   sellButtonText?: string;
   className?: string;
 }
 
 export const PrenicheHeader: React.FC<PrenicheHeaderProps> = ({
+  initialQuery = "",
+  onSearchChange,
   sellButtonText = "Sell Product",
   className = "",
 }) => {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+
+  React.useEffect(() => {
+    setSearchQuery(initialQuery);
+  }, [initialQuery]);
 
   // PROTECTED NAVIGATION HANDLER
   const handleProtectedNavigation = (targetPath: string) => {
@@ -37,8 +45,14 @@ export const PrenicheHeader: React.FC<PrenicheHeaderProps> = ({
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    onSearchChange?.(val);
+  };
+
   return (
-    <header className={`flex items-center justify-between px-2 sm:px-4 py-2 w-full gap-4 ${className}`}>
+    <header className={`flex items-center justify-between px-2 sm:px-6 py-2 w-full gap-4 ${className}`}>
       {/* Left: Preniche Logo */}
       <Link
         href="/"
@@ -50,14 +64,14 @@ export const PrenicheHeader: React.FC<PrenicheHeaderProps> = ({
       {/* Center: Capsule search bar */}
       <form
         onSubmit={handleSearchSubmit}
-        className="rounded-full bg-[#BA8290]/40 border border-[#A26C7A] px-5 py-2.5 w-full max-w-[420px] flex items-center gap-3 backdrop-blur-xs shadow-[inset_0_1px_3px_rgba(0,0,0,0.1)] focus-within:border-white/60 transition-all"
+        className="rounded-full bg-[#BA8290]/40 border border-[#A26C7A] px-5 py-2.5 w-full max-w-[500px] flex items-center gap-3 backdrop-blur-xs shadow-[inset_0_1px_3px_rgba(0,0,0,0.12)] focus-within:border-white/70 focus-within:bg-[#BA8290]/60 transition-all"
       >
         <Search className="w-5 h-5 text-[#2C151D] shrink-0" />
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder=""
+          onChange={handleInputChange}
+          placeholder="Cari produk preloved..."
           className="bg-transparent text-[#1A0B10] placeholder:text-[#59313D]/70 text-sm w-full outline-none font-medium"
         />
       </form>
@@ -68,7 +82,7 @@ export const PrenicheHeader: React.FC<PrenicheHeaderProps> = ({
         <button
           type="button"
           onClick={() => handleProtectedNavigation("/sell")}
-          className="rounded-full bg-[#8C5663] text-white px-5 py-2 flex items-center gap-2 text-sm font-semibold shadow-sm hover:bg-[#7A4955] active:scale-95 transition-all cursor-pointer"
+          className="rounded-full bg-[#7D4D5B] text-white px-5 py-2.5 flex items-center gap-2 text-sm font-semibold shadow-md hover:bg-[#6D3E4C] active:scale-95 transition-all cursor-pointer"
         >
           <PlusCircle className="w-4 h-4 text-white" />
           <span>{sellButtonText}</span>

@@ -42,3 +42,12 @@ body {
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0.75rem);
 }
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

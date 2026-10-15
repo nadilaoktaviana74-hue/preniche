@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { PrenicheHeader } from "@/components/PrenicheHeader";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get("redirect") || "/";
@@ -156,5 +156,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#BD8094]" />}>
+      <LoginForm />
+    </Suspense>
   );
 }

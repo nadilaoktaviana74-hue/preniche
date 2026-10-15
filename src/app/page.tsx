@@ -287,15 +287,18 @@ export default function HomePage() {
               </h2>
               <div className="border-b border-[#7A4955] mb-3 w-full" />
               <div className="flex flex-wrap gap-x-2 gap-y-1.5 content-start overflow-hidden">
-                {popularTags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/catalog?q=${encodeURIComponent(tag.replace("#", ""))}`}
-                    className="text-xs font-medium text-white/90 hover:text-white cursor-pointer transition-colors leading-relaxed"
-                  >
-                    {tag}
-                  </Link>
-                ))}
+                {popularTags.map((tag) => {
+                  const queryText = tag.replace("#", "").replace(/([a-z])([A-Z])/g, "$1 $2");
+                  return (
+                    <Link
+                      key={tag}
+                      href={`/catalog?q=${encodeURIComponent(queryText)}`}
+                      className="text-xs font-medium text-white/90 hover:text-white cursor-pointer transition-colors leading-relaxed"
+                    >
+                      {tag}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </aside>

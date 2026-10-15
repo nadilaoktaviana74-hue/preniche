@@ -19,7 +19,12 @@ export const Navbar = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
-  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+  if (
+    pathname === "/" ||
+    pathname === "/catalog" ||
+    pathname === "/login" ||
+    pathname === "/register"
+  ) {
     return null;
   }
 
